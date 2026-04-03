@@ -79,11 +79,26 @@ indev = axs15231.AXS15231(touch_i2c, debug=True)
 # LVGL is not calling the driver's read method
 ```
 
-**Possible solutions:**
-1. Check if `pointer_framework` module is included in firmware
-2. Manually register touch input device with LVGL
-3. Use manufacturer's firmware that may have working touch
-4. Check if touch needs interrupt pin configuration (not just I2C polling)
+**Investigation Results:**
+We successfully verified that:
+1. ✅ Touch hardware works perfectly - hundreds of touch events captured
+2. ✅ I2C communication works - coordinates read accurately
+3. ✅ Touch data format is correct (X, Y coordinates parsed properly)
+4. ❌ LVGL doesn't call touch read callbacks
+5. ❌ Manual event injection doesn't update display
+6. ❌ `pointer_framework` automatic registration doesn't work
+
+**Conclusion:**
+The touch hardware is fully functional, but the MicroPython LVGL firmware has a broken or incomplete touch input device integration. The firmware would need to be rebuilt with proper LVGL touch support, or a different firmware version with working touch is needed.
+
+**Attempted Solutions (all failed):**
+1. Using `pointer_framework.PointerDriver` automatic registration
+2. Manual `lv.indev_create()` with read callback
+3. Manual event injection with `send_event()`
+4. Direct touch polling in main loop with display updates
+
+**Recommendation:**
+Contact the firmware developer or use the manufacturer's original firmware that may have working touch integration.
 
 ## Recommended Next Steps
 
