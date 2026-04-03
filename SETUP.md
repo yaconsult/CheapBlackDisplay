@@ -4,9 +4,13 @@
 
 This project uses a Python virtual environment in `.venv` to manage dependencies.
 
+**Note:** PyCharm automatically creates the `.venv` virtual environment when you open the project. If it doesn't exist, PyCharm will prompt you to create it.
+
 ### First Time Setup
 
-1. **Create virtual environment using uv** (recommended):
+1. **Virtual environment** (PyCharm creates this automatically as `.venv`):
+
+If you need to create it manually:
 ```bash
 uv venv
 ```

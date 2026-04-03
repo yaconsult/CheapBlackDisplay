@@ -22,9 +22,11 @@ This is a MicroPython project for the JC3248W535EN board (aka "Cheap Black Displ
 ## Quick Start
 
 ### First Time Setup
+
+**Note:** PyCharm automatically creates `.venv` when you open the project.
+
 ```bash
-# 1. Create and activate virtual environment (using uv - faster)
-uv venv
+# 1. Activate virtual environment (PyCharm terminal does this automatically)
 source .venv/bin/activate
 
 # 2. Install dependencies (using uv - faster)
@@ -32,6 +34,13 @@ uv pip install -r requirements.txt
 
 # 3. Upload all files to board
 python upload_files.py
+```
+
+Or if `.venv` doesn't exist, create it first:
+```bash
+uv venv  # Creates .venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
 ```
 
 ### In PyCharm Terminal (Alt+F12)
