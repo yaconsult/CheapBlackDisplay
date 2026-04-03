@@ -21,22 +21,29 @@ This is a MicroPython project for the JC3248W535EN board (aka "Cheap Black Displ
 
 ## Quick Start
 
-1. **Upload files to board**:
-   ```bash
-   python3 upload_files.py
-   ```
+### In PyCharm Terminal (Alt+F12)
+```bash
+# Simple display + touch test
+python3 quick_test.py
 
-2. **Run display test** (no touch):
-   ```bash
-   python3 run_test.py test_display_simple
-   ```
+# Landscape mode (480x320)
+python3 run_test.py test_landscape_mode
 
-3. **Run touch test** (display + touch):
-   ```bash
-   python3 run_touch_test.py
-   ```
+# Portrait mode (320x480)
+python3 run_test.py test_portrait_mode
+```
 
-4. **See detailed instructions**: Check `USAGE.md`
+### First Time Setup
+```bash
+# Upload all files to board
+python3 upload_files.py
+```
+
+### 📖 Complete Documentation
+- **`RUNNING_TESTS.md`** - Complete guide for running tests in PyCharm and terminal
+- **`USAGE.md`** - Detailed usage examples and code samples
+- **`TROUBLESHOOTING.md`** - Known issues and solutions
+- **`TOUCH_WORKING.md`** - Touch functionality guide
 
 ## Resources
 - **GitHub Repository**: https://github.com/de-dh/ESP32-JC3248W535-Micropython-LVGL
