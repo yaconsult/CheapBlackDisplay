@@ -56,4 +56,6 @@ This is a MicroPython project for the JC3248W535EN board (aka "Cheap Black Displ
 ## Working Test Scripts
 - `test_display_simple.py` - Display only test (no touch)
 - `test_display_with_touch.py` - Full display + touch test with button
+- `test_landscape_mode.py` - Landscape mode (480x320) with touch and UI elements
+- `test_portrait_mode.py` - Portrait mode (320x480) with touch and UI elements
 - `run_touch_test.py` - Helper script to run touch test (auto-detects serial port)
