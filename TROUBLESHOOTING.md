@@ -93,12 +93,24 @@ The touch hardware is fully functional, but the MicroPython LVGL firmware has a 
 
 **Attempted Solutions (all failed):**
 1. Using `pointer_framework.PointerDriver` automatic registration
-2. Manual `lv.indev_create()` with read callback
+2. Manual `lv.indev_create()` with read callback (LVGL v9 API)
 3. Manual event injection with `send_event()`
 4. Direct touch polling in main loop with display updates
+5. Background threading with continuous touch polling
+6. Adapting Arduino LVGL approach to MicroPython
 
-**Recommendation:**
-Contact the firmware developer or use the manufacturer's original firmware that may have working touch integration.
+**Comparison with Arduino Code:**
+The Arduino demo uses LVGL v8 with `lv_indev_drv_register()` and a dedicated LVGL task that continuously calls touch callbacks. The MicroPython firmware uses LVGL v9 with `lv.indev_create()` but the LVGL task/timer system never calls the registered touch callback.
+
+**Root Cause:**
+LVGL v9 in this MicroPython firmware has broken input device processing. The input device can be registered, but LVGL's internal task/timer system never calls the `read_cb` callback function, making it impossible for touch events to reach LVGL's event system.
+
+**Recommendations:**
+1. Use the manufacturer's Arduino firmware (proven working with touch)
+2. Contact firmware developer about LVGL v9 input device bug
+3. Try to find MicroPython firmware with LVGL v8 (older API that might work)
+4. Build custom MicroPython firmware with fixed LVGL v9 integration
+5. Use Arduino instead of MicroPython for this board
 
 ## Recommended Next Steps
 
