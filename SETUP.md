@@ -6,7 +6,12 @@ This project uses a Python virtual environment in `.venv` to manage dependencies
 
 ### First Time Setup
 
-1. **Create virtual environment** (if not already created):
+1. **Create virtual environment using uv** (recommended):
+```bash
+uv venv
+```
+
+Or using standard Python:
 ```bash
 python3 -m venv .venv
 ```
@@ -16,14 +21,14 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-3. **Install dependencies**:
+3. **Install dependencies using uv** (faster):
 ```bash
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
-Or install pyserial directly:
+Or using standard pip:
 ```bash
-pip install pyserial
+pip install -r requirements.txt
 ```
 
 ### PyCharm Setup

@@ -23,12 +23,12 @@ This is a MicroPython project for the JC3248W535EN board (aka "Cheap Black Displ
 
 ### First Time Setup
 ```bash
-# 1. Create and activate virtual environment
-python3 -m venv .venv
+# 1. Create and activate virtual environment (using uv - faster)
+uv venv
 source .venv/bin/activate
 
-# 2. Install dependencies
-pip install -r requirements.txt
+# 2. Install dependencies (using uv - faster)
+uv pip install -r requirements.txt
 
 # 3. Upload all files to board
 python upload_files.py

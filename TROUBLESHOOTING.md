@@ -30,28 +30,60 @@
 - Display needs specific power-on sequence
 
 **Workarounds:**
-1. Unplug and replug USB cable
-2. Run `python3 quick_test.py` without doing soft resets
+1. Unplug and replug USB cable (most reliable)
+2. Run `python quick_test.py` without doing soft resets
 3. Avoid running multiple tests in sequence
 4. If display goes black, power cycle the board
+5. Display going black appears to happen most often:
+   - After soft resets (Ctrl-D)
+   - After uploading new files
+   - After running certain tests
+   - Randomly during operation
+
+**Note:** This is a persistent hardware/firmware issue, not a software bug in our test code. All initialization succeeds, but display power/backlight becomes unstable.
 
 #### 2. Touch Not Responding
 
 **Symptom:** Touch controller initializes successfully but doesn't detect touch events.
 
-**Status:** Cannot fully test due to display going black during touch diagnostic tests.
+**Status:** Hardware is working but LVGL is not polling the touch driver.
 
-**What we know:**
-- Touch controller (AXS15231) initializes without errors
-- I2C communication appears to work (no errors during init)
-- Touch events not being detected when screen is touched
-- Need to verify I2C scan shows device at address 0x3B
+**What we've verified:**
+- ✅ Touch controller (AXS15231) detected on I2C at address 0x3B
+- ✅ Touch controller initializes without errors
+- ✅ I2C communication working (scan shows device at 0x3B)
+- ❌ Touch events not being detected when screen is touched
+- ❌ LVGL not polling touch driver (no debug output from driver's read method)
+- ❌ Touch input device may not be properly registered with LVGL
 
-**Next steps to test (when display is stable):**
-1. Run I2C scan to verify touch controller is detected
-2. Check if touch controller needs additional initialization
-3. Verify touch coordinates are being read
-4. Check if touch calibration is needed
+**Root cause:** The touch driver inherits from `pointer_framework.PointerDriver` which should handle LVGL registration, but LVGL is not calling the driver's `_get_coords()` method. This suggests:
+1. Missing `pointer_framework` module or incorrect version
+2. Touch input device not properly registered with LVGL
+3. Firmware issue with LVGL touch input handling
+
+**Tests performed:**
+```bash
+# I2C scan - PASSED
+from i2c import I2C
+i2c_bus = I2C.Bus(host=1, sda=4, scl=8)
+devices = i2c_bus.scan()
+# Result: ['0x3b'] - touch controller detected
+
+# Touch initialization - PASSED
+touch_i2c = I2C.Device(i2c_bus, 0x3B, 8)
+indev = axs15231.AXS15231(touch_i2c, debug=True)
+# No errors during initialization
+
+# Touch polling - FAILED
+# With debug=True, no output from driver when touching screen
+# LVGL is not calling the driver's read method
+```
+
+**Possible solutions:**
+1. Check if `pointer_framework` module is included in firmware
+2. Manually register touch input device with LVGL
+3. Use manufacturer's firmware that may have working touch
+4. Check if touch needs interrupt pin configuration (not just I2C polling)
 
 ## Recommended Next Steps
 
