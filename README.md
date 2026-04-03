@@ -21,22 +21,30 @@ This is a MicroPython project for the JC3248W535EN board (aka "Cheap Black Displ
 
 ## Quick Start
 
-### In PyCharm Terminal (Alt+F12)
-```bash
-# Simple display + touch test
-python3 quick_test.py
-
-# Landscape mode (480x320)
-python3 run_test.py test_landscape_mode
-
-# Portrait mode (320x480)
-python3 run_test.py test_portrait_mode
-```
-
 ### First Time Setup
 ```bash
-# Upload all files to board
-python3 upload_files.py
+# 1. Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Upload all files to board
+python upload_files.py
+```
+
+### In PyCharm Terminal (Alt+F12)
+PyCharm automatically activates `.venv`:
+```bash
+# Simple display + touch test
+python quick_test.py
+
+# Landscape mode (480x320)
+python run_test.py test_landscape_mode
+
+# Portrait mode (320x480)
+python run_test.py test_portrait_mode
 ```
 
 ### 📖 Complete Documentation

@@ -3,29 +3,33 @@
 ## Quick Reference
 
 ### In PyCharm Terminal
+PyCharm automatically activates the `.venv` virtual environment:
 ```bash
 # Simple display test (no touch)
-python3 quick_test.py
+python quick_test.py
 
 # Landscape mode test
-python3 run_test.py test_landscape_mode
+python run_test.py test_landscape_mode
 
 # Portrait mode test
-python3 run_test.py test_portrait_mode
+python run_test.py test_portrait_mode
 
 # Touch diagnostic
 ./run_touch_diagnostic.sh
 ```
 
-### In Any Terminal
+### In System Terminal
 ```bash
 cd /home/lpinard/PycharmProjects/CheapBlackDisplay
 
+# Activate virtual environment
+source .venv/bin/activate
+
 # Run any test
-python3 quick_test.py
-python3 run_test.py test_display_simple
-python3 run_test.py test_landscape_mode
-python3 run_test.py test_portrait_mode
+python quick_test.py
+python run_test.py test_display_simple
+python run_test.py test_landscape_mode
+python run_test.py test_portrait_mode
 ```
 
 ---
