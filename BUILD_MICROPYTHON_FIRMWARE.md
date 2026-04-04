@@ -231,7 +231,12 @@ git clone -b v5.0.4 --recursive https://github.com/espressif/esp-idf.git
 # Navigate to ESP-IDF directory
 cd esp-idf
 
-# Install ESP-IDF tools for ESP32-S3
+# Set Python version to 3.11 (required for ESP-IDF v5.0.4)
+export IDF_PYTHON_ENV_PATH=$HOME/.espressif/python_env/idf5.0_py3.11_env
+export ESP_IDF_PYTHON=python3.11
+
+# Install ESP-IDF tools for ESP32-S3 with Python 3.11
+python3.11 -m pip install --user -r requirements.txt
 ./install.sh esp32s3
 
 # This will download and install:
