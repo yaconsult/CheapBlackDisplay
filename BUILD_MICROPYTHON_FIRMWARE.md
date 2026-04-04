@@ -377,12 +377,45 @@ CONFIG_ESP_CONSOLE_SECONDARY_NONE=y
 # CPU configuration
 CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240=y
 
-# Partition table
-CONFIG_PARTITION_TABLE_CUSTOM=y
-CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+### Step 4: Create board.json
+
+**Location:** `boards/ESP32_GENERIC_S3_JC3248W535/board.json`
+
+```bash
+# You should still be in the board directory
+pwd
+# Should show: .../boards/ESP32_GENERIC_S3_JC3248W535
+
+# Create the file
+nano board.json
 ```
 
-### Step 4: Create mpconfigboard.cmake
+Create `board.json` with this content:
+
+```json
+{
+    "deploy": [
+        "../deploy.md"
+    ],
+    "docs": "",
+    "features": [
+        "BLE",
+        "External Flash",
+        "External RAM",
+        "WiFi"
+    ],
+    "images": [
+        "ESP32_GENERIC_S3.jpg"
+    ],
+    "mcu": "esp32s3",
+    "product": "ESP32-S3 JC3248W535",
+    "thumbnail": "",
+    "url": "https://github.com/wireless-tag-com/JC3248W535",
+    "vendor": "Wireless-Tag"
+}
+```
+
+### Step 5: Create mpconfigboard.cmake
 
 **Location:** `boards/ESP32_GENERIC_S3_JC3248W535/mpconfigboard.cmake`
 
