@@ -29,6 +29,28 @@ This guide provides detailed steps to set up PlatformIO for developing Arduino c
 - **USB:** Working USB connection to board
 - **Permissions:** Access to serial ports
 
+### Disk Space Requirements
+
+**PlatformIO Installation:**
+- **PlatformIO Core:** ~500 MB
+- **ESP32 Platform:** ~1.5 GB (includes toolchain, frameworks)
+- **LVGL Library:** ~50 MB
+- **Project files:** ~100 MB
+- **Build artifacts:** ~200-500 MB per project
+- **Total recommended:** **3-4 GB free space**
+
+**Breakdown:**
+```
+~/.platformio/          1.5-2 GB  (platforms, toolchains, packages)
+~/project/lib/          50-100 MB (libraries)
+~/project/.pio/         200-500 MB (build cache, dependencies)
+```
+
+**Compared to alternatives:**
+- Arduino IDE: ~2-3 GB (IDE + ESP32 support + libraries)
+- Arduino CLI: ~1.5-2 GB (toolchain + libraries, no GUI)
+- PlatformIO: ~3-4 GB (most comprehensive, includes build cache)
+
 ### Check Python Version
 
 ```bash

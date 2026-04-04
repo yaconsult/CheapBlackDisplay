@@ -8,10 +8,34 @@ This guide shows how to flash the Arduino DEMO_LVGL to verify touch works with A
 
 ## Prerequisites
 
+### Choose Your Tool
+
 You need either:
 - **Arduino IDE** (easiest for testing)
 - **PlatformIO** (better for development - see PLATFORMIO_SETUP.md)
 - **Arduino CLI** (command line)
+
+### Disk Space Requirements
+
+| Tool | Installation Size | ESP32 Support | Libraries | Build Cache | Total |
+|------|------------------|---------------|-----------|-------------|-------|
+| **Arduino IDE** | ~400 MB | ~1.2 GB | ~200 MB | ~500 MB | **~2-3 GB** |
+| **Arduino CLI** | ~50 MB | ~1.2 GB | ~200 MB | ~500 MB | **~1.5-2 GB** |
+| **PlatformIO** | ~500 MB | ~1.5 GB | ~100 MB | ~500 MB | **~3-4 GB** |
+| **esptool.py only** | ~10 MB | - | - | - | **~10 MB** |
+
+**Recommended free space:** 5 GB to be safe
+
+**What takes space:**
+- **IDE/Tool:** Application files
+- **ESP32 Support:** Compiler toolchain, libraries, SDK
+- **Libraries:** LVGL and other dependencies
+- **Build Cache:** Compiled objects, temporary files
+
+**Space-saving tips:**
+- Use Arduino CLI instead of IDE if you don't need GUI
+- Use esptool.py if you only need to flash pre-compiled binaries
+- Clean build cache regularly: `pio run -t clean` or delete build folders
 
 ---
 
@@ -19,20 +43,39 @@ You need either:
 
 ### Step 1: Install Arduino IDE
 
+**Check available disk space first:**
 ```bash
-# Download from https://www.arduino.cc/en/software
-# Or install via package manager:
+df -h ~
+# Need at least 3-5 GB free
+```
 
-# Ubuntu/Debian
+**Install Arduino IDE:**
+
+```bash
+# Option A: Download from https://www.arduino.cc/en/software
+# Latest version (Arduino IDE 2.x): ~400 MB download, ~600 MB installed
+
+# Option B: Package manager (older version 1.x)
 sudo apt install arduino
+# Size: ~200 MB installed
 
-# Or download latest version:
+# Option C: Download AppImage (recommended - latest version)
 wget https://downloads.arduino.cc/arduino-ide/arduino-ide_2.3.2_Linux_64bit.AppImage
 chmod +x arduino-ide_2.3.2_Linux_64bit.AppImage
 ./arduino-ide_2.3.2_Linux_64bit.AppImage
+# Size: ~400 MB download, runs without installation
 ```
 
+**Disk space after full setup:**
+- Arduino IDE: ~600 MB
+- ESP32 board support: ~1.2 GB
+- Libraries (LVGL, etc.): ~200 MB
+- Build cache: ~500 MB
+- **Total: ~2.5 GB**
+
 ### Step 2: Install ESP32 Board Support
+
+**This will download ~1.2 GB of files**
 
 1. Open Arduino IDE
 2. Go to **File → Preferences**
@@ -44,7 +87,13 @@ chmod +x arduino-ide_2.3.2_Linux_64bit.AppImage
 5. Go to **Tools → Board → Boards Manager**
 6. Search for "esp32"
 7. Install **"esp32 by Espressif Systems" version 3.0.2** (as specified in Must see for use.txt)
-8. Wait for installation to complete
+8. Wait for installation to complete (~10-15 minutes on slow connection)
+
+**What gets installed:**
+- Xtensa toolchain: ~800 MB
+- ESP32 Arduino framework: ~300 MB
+- Platform tools: ~100 MB
+- **Total: ~1.2 GB** in `~/.arduino15/packages/esp32/`
 
 ### Step 3: Install Required Libraries
 
