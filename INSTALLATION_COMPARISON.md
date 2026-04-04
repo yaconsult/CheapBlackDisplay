@@ -8,14 +8,14 @@ This document compares all installation options for flashing code to the JC3248W
 
 ## Quick Comparison Table
 
-| Method | Disk Space | Install Time | Difficulty | Best For |
-|--------|-----------|--------------|------------|----------|
-| **esptool.py only** | 10 MB | 1 min | Easy | Flashing pre-compiled binaries |
-| **Arduino CLI** | 1.5-2 GB | 10-15 min | Medium | Command-line development |
-| **Arduino IDE** | 2-3 GB | 15-20 min | Easy | GUI-based development, testing |
-| **PlatformIO CLI** | 3-4 GB | 15-20 min | Medium | Professional development |
-| **PlatformIO IDE** | 4-5 GB | 20-30 min | Easy | Full IDE experience |
-| **ESP-IDF (Official SDK)** | 3-5 GB | 20-30 min | Hard | Native ESP32 development, maximum control |
+| Method | Disk Space | Install Time | Difficulty | Debugging | Best For |
+|--------|-----------|--------------|------------|-----------|----------|
+| **esptool.py only** | 10 MB | 1 min | Easy | ❌ None | Flashing pre-compiled binaries |
+| **Arduino CLI** | 1.5-2 GB | 10-15 min | Medium | ⚠️ Serial only | Command-line development |
+| **Arduino IDE** | 2-3 GB | 15-20 min | Easy | ⚠️ Serial only | GUI-based development, testing |
+| **PlatformIO CLI** | 3-4 GB | 15-20 min | Medium | ✅ Full GDB | Professional development |
+| **PlatformIO IDE** | 4-5 GB | 20-30 min | Easy | ✅ Visual debugger | Full IDE experience |
+| **ESP-IDF (Official SDK)** | 3-5 GB | 20-30 min | Hard | ✅ Full GDB + OpenOCD | Native ESP32 development, maximum control |
 
 ---
 
@@ -50,6 +50,10 @@ uv pip install esptool
 - ✅ Erase flash
 - ❌ Cannot compile code
 - ❌ Cannot modify source
+- ❌ No debugging
+
+### Debugging Support
+- **None** - Only flashing tool
 
 ### Pros
 - Minimal disk space
@@ -59,6 +63,7 @@ uv pip install esptool
 ### Cons
 - Cannot compile your own code
 - Need pre-built binaries
+- No debugging capabilities
 
 ---
 
@@ -106,8 +111,15 @@ arduino-cli lib install "lvgl@8.3.11"
 - ✅ Upload to board
 - ✅ Manage libraries
 - ✅ Script builds
+- ⚠️ Serial debugging only
 - ❌ No GUI
 - ❌ Manual code editing
+
+### Debugging Support
+- **Serial Monitor** - Print statements only
+- No breakpoints
+- No variable inspection
+- No step-through debugging
 
 ### Pros
 - Smaller than Arduino IDE
@@ -118,6 +130,7 @@ arduino-cli lib install "lvgl@8.3.11"
 - Command-line only
 - Need separate text editor
 - Less beginner-friendly
+- Limited debugging (serial only)
 
 ---
 
@@ -182,6 +195,16 @@ sudo apt install arduino
 - ✅ Library manager
 - ✅ Board manager
 - ✅ Beginner-friendly
+- ⚠️ Serial debugging only
+
+### Debugging Support
+- **Serial Monitor** - Print statements only
+- **Serial Plotter** - Graph data
+- No breakpoints
+- No variable inspection
+- No step-through debugging
+
+**Note:** Arduino IDE 2.x has experimental debugger support, but requires additional setup and external hardware debugger for ESP32-S3.
 
 ### Pros
 - Easy to use
@@ -193,6 +216,7 @@ sudo apt install arduino
 - Larger disk space
 - Slower than CLI
 - Less automation
+- Limited debugging (serial only by default)
 
 ---
 
@@ -247,17 +271,41 @@ pio project init -b esp32-s3-devkitc-1
 - ✅ Library dependency management
 - ✅ CI/CD integration
 - ✅ Custom build scripts
+- ✅ **Full GDB debugging via USB**
+
+### Debugging Support
+- **Built-in USB JTAG debugging** - ESP32-S3 native support
+- ✅ Breakpoints
+- ✅ Variable inspection
+- ✅ Step-through debugging
+- ✅ Call stack inspection
+- ✅ Memory viewer
+- Command-line GDB interface
+
+**Setup:**
+```ini
+# In platformio.ini
+debug_tool = esp-builtin
+debug_speed = 12000
+```
+
+**Debug command:**
+```bash
+pio debug
+```
 
 ### Pros
 - Professional features
 - Better dependency management
 - Faster builds
 - Multi-platform support
+- **Full hardware debugging via USB**
 
 ### Cons
 - Larger disk space
 - Steeper learning curve
 - Command-line focused
+- GDB command-line interface (no visual debugger)
 
 ---
 
@@ -302,17 +350,38 @@ code
 
 ### What You Can Do
 - ✅ Full IDE features
-- ✅ Visual debugging
+- ✅ **Visual debugging with breakpoints**
 - ✅ IntelliSense
 - ✅ Git integration
 - ✅ Terminal integration
 - ✅ Project management
 
+### Debugging Support
+- **Visual debugger** - Full GUI debugging
+- ✅ Breakpoints (click in gutter)
+- ✅ Variable inspection (hover/watch)
+- ✅ Step over/into/out
+- ✅ Call stack viewer
+- ✅ Memory viewer
+- ✅ Register viewer
+- ✅ Peripheral viewer (ESP32 specific)
+- **Built-in USB JTAG** - No external hardware needed
+
+**Setup:**
+```ini
+# In platformio.ini
+debug_tool = esp-builtin
+debug_speed = 12000
+```
+
+**Usage:** Press F5 or click Debug icon
+
 ### Pros
-- Best development experience
-- Visual debugging
+- **Best development experience**
+- **Visual debugging interface**
 - Integrated tools
 - Professional features
+- Point-and-click debugging
 
 ### Cons
 - Largest disk space
@@ -507,14 +576,43 @@ idf.py -p /dev/ttyACM0 flash monitor
 - ✅ WiFi, Bluetooth, etc.
 - ✅ Custom partition tables
 - ✅ OTA updates
+- ✅ **Advanced debugging with OpenOCD**
 - ❌ More complex than Arduino
 - ❌ Steeper learning curve
+
+### Debugging Support
+- **OpenOCD + GDB** - Professional debugging
+- ✅ Breakpoints
+- ✅ Watchpoints
+- ✅ Variable inspection
+- ✅ Step-through debugging
+- ✅ Call stack
+- ✅ Memory/register viewer
+- ✅ Multi-core debugging
+- ✅ FreeRTOS task awareness
+- ✅ **Built-in USB JTAG** - No external hardware
+
+**Setup:**
+```bash
+# Start OpenOCD (automatic with built-in JTAG)
+openocd -f board/esp32s3-builtin.cfg
+
+# In another terminal
+xtensa-esp32s3-elf-gdb build/app.elf
+(gdb) target remote :3333
+(gdb) monitor reset halt
+(gdb) break app_main
+(gdb) continue
+```
+
+**Or use VS Code with ESP-IDF extension for visual debugging**
 
 ### Pros
 - Maximum control and performance
 - Official Espressif support
 - Access to all ESP32 features
 - Professional development
+- **Best debugging tools**
 - Best documentation
 - Active community
 
@@ -524,6 +622,7 @@ idf.py -p /dev/ttyACM0 flash monitor
 - No Arduino libraries
 - Complex build system
 - Longer development time
+- GDB command-line (unless using VS Code extension)
 
 ### Disk Space Breakdown
 

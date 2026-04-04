@@ -415,6 +415,71 @@ pio run --target upload && pio device monitor
 
 ---
 
+## Debugging Support
+
+### Built-in USB JTAG Debugging
+
+The ESP32-S3 has **built-in USB JTAG** - no external debugger needed!
+
+#### Configure Debugging
+
+Add to `platformio.ini`:
+
+```ini
+[env:esp32-s3-devkitc-1]
+# ... existing config ...
+
+# Debugging configuration
+debug_tool = esp-builtin
+debug_init_break = tbreak setup
+debug_speed = 12000
+
+# Build with debug symbols
+build_type = debug
+build_flags = 
+    -DCORE_DEBUG_LEVEL=5
+    -O0
+    -g3
+```
+
+#### Start Debugging in VS Code
+
+1. **Set breakpoints** - Click in gutter next to line numbers
+2. **Press F5** - Start debugging
+3. **Use debug controls:**
+   - F10 - Step Over
+   - F11 - Step Into
+   - Shift+F11 - Step Out
+   - F5 - Continue
+
+#### Command-Line Debugging
+
+```bash
+# Start debugger
+pio debug
+
+# GDB commands:
+(gdb) break setup
+(gdb) continue
+(gdb) next
+(gdb) print myVariable
+(gdb) backtrace
+```
+
+#### What You Can Do
+
+- ✅ Set breakpoints
+- ✅ Step through code line by line
+- ✅ Inspect variables in real-time
+- ✅ View call stack
+- ✅ Examine memory
+- ✅ Watch expressions
+- ✅ No external hardware needed!
+
+**See DEBUGGING_GUIDE.md for complete debugging tutorial**
+
+---
+
 ## Troubleshooting
 
 ### Serial Port Not Found

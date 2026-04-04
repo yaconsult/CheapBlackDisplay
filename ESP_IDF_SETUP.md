@@ -559,6 +559,101 @@ xtensa-esp32s3-elf-gdb build/jc3248w535_demo.elf
 
 ---
 
+## Debugging with OpenOCD and GDB
+
+### Built-in USB JTAG
+
+The ESP32-S3 has **built-in USB JTAG debugging** via the USB port.
+
+### Step 1: Build with Debug Symbols
+
+```bash
+# Configure for debugging
+idf.py menuconfig
+
+# Navigate to:
+# Component config → Compiler options → Optimization Level → Debug (-Og)
+
+# Build
+idf.py build
+idf.py -p /dev/ttyACM0 flash
+```
+
+### Step 2: Start OpenOCD
+
+```bash
+# In one terminal
+openocd -f board/esp32s3-builtin.cfg
+
+# Should show:
+# Info : Listening on port 3333 for gdb connections
+```
+
+### Step 3: Start GDB
+
+```bash
+# In another terminal
+xtensa-esp32s3-elf-gdb build/jc3248w535_demo.elf
+
+# Connect to OpenOCD
+(gdb) target remote :3333
+
+# Reset and halt
+(gdb) monitor reset halt
+
+# Set breakpoint
+(gdb) break app_main
+
+# Continue
+(gdb) continue
+```
+
+### GDB Commands
+
+```gdb
+# Breakpoints
+(gdb) break function_name
+(gdb) break file.c:42
+
+# Step commands
+(gdb) next      # Step over
+(gdb) step      # Step into
+(gdb) finish    # Step out
+(gdb) continue  # Run until breakpoint
+
+# Inspect variables
+(gdb) print variable_name
+(gdb) print /x variable_name  # Hex format
+
+# View backtrace
+(gdb) backtrace
+
+# List source
+(gdb) list
+
+# Info
+(gdb) info locals
+(gdb) info registers
+(gdb) info threads
+
+# Memory
+(gdb) x/16x 0x3FC00000
+```
+
+### Visual Debugging with VS Code
+
+Install ESP-IDF extension in VS Code for visual debugging:
+
+1. Install "Espressif IDF" extension
+2. Configure `.vscode/launch.json`
+3. Press F5 to start debugging
+4. Set breakpoints by clicking in gutter
+5. Use debug controls (F10, F11, etc.)
+
+**See DEBUGGING_GUIDE.md for complete tutorial**
+
+---
+
 ## Resources
 
 - **ESP-IDF Documentation:** https://docs.espressif.com/projects/esp-idf/
