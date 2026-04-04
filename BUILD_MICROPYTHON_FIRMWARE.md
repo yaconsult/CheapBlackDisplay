@@ -1044,8 +1044,14 @@ python3.11 make.py esp32 BOARD=ESP32_GENERIC_S3_JC3248W535 CFLAGS_EXTRA="-Wno-er
 
 **Output location:**
 ```
-build/ESP32_GENERIC_S3_JC3248W535-SPIRAM_OCT-16/firmware.bin
+lib/micropython/ports/esp32/build-ESP32_GENERIC_S3_JC3248W535/firmware.bin
 ```
+
+**Important Notes:**
+- The build process will compile mpy-cross first, then the ESP32 firmware
+- You must have ESP-IDF environment sourced (done automatically by make.py)
+- Build warnings are normal with GCC 12+, but errors will stop the build
+- If build fails, check the log files in `build-ESP32_GENERIC_S3_JC3248W535/log/`
 
 ### Step 3: Monitor Build Progress
 
