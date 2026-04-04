@@ -893,6 +893,223 @@ python3 make.py esp32 BOARD=ESP32_GENERIC_S3_JC3248W535 BOARD_VARIANT=SPIRAM_OCT
 
 ---
 
+## Debugging MicroPython Firmware
+
+### Important Limitation
+
+**MicroPython does NOT support hardware debugging:**
+- ❌ No breakpoints
+- ❌ No step-through debugging
+- ❌ No variable inspection via debugger
+- ❌ Cannot use GDB/OpenOCD
+- ❌ Built-in USB JTAG not accessible from Python
+
+### Why No Hardware Debugging?
+
+MicroPython runs as an **interpreter** on top of the firmware:
+- Python code is interpreted at runtime
+- No direct mapping to machine code
+- Hardware debugger sees C firmware, not Python code
+- Would need Python-aware debugger (doesn't exist for MicroPython)
+
+### Available Debugging Methods
+
+#### 1. REPL (Read-Eval-Print Loop)
+
+**Interactive Python shell:**
+```python
+>>> import lvgl as lv
+>>> lv.init()
+>>> print(lv.version_info())
+```
+
+**Pros:**
+- Interactive testing
+- Immediate feedback
+- Inspect objects
+
+**Cons:**
+- No breakpoints
+- No step-through
+- Manual process
+
+#### 2. Print Statements
+
+**Add debug output:**
+```python
+def _get_coords(self):
+    print("_get_coords called", file=sys.stderr)
+    state, x, y = self._read_data()
+    print(f"Touch: state={state}, x={x}, y={y}", file=sys.stderr)
+    return state, x, y
+```
+
+**Pros:**
+- Simple
+- Works everywhere
+- Can log to file
+
+**Cons:**
+- Clutters code
+- Slow for complex issues
+- No variable inspection
+
+#### 3. Exception Tracebacks
+
+**Python shows stack trace on errors:**
+```python
+Traceback (most recent call last):
+  File "main.py", line 42, in <module>
+  File "axs15231.py", line 67, in _get_coords
+AttributeError: 'NoneType' object has no attribute 'x'
+```
+
+**Helpful for:**
+- Finding crash location
+- Understanding call stack
+- Identifying error types
+
+#### 4. Logging Module
+
+**Structured logging:**
+```python
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+def _get_coords(self):
+    logger.debug("_get_coords called")
+    logger.debug(f"Touch data: {touch_data}")
+    return state, x, y
+```
+
+#### 5. Memory Profiling
+
+**Check memory usage:**
+```python
+import gc
+import micropython
+
+# Show memory info
+micropython.mem_info()
+
+# Garbage collection
+gc.collect()
+print(f"Free memory: {gc.mem_free()} bytes")
+```
+
+#### 6. Timing Analysis
+
+**Measure execution time:**
+```python
+import time
+
+start = time.ticks_ms()
+# ... code to measure ...
+elapsed = time.ticks_diff(time.ticks_ms(), start)
+print(f"Took {elapsed} ms")
+```
+
+### Debugging Touch Issue in MicroPython
+
+**Since we can't use hardware debugger, use print statements:**
+
+```python
+# In axs15231.py
+import sys
+
+class AXS15231(pointer_framework.PointerDriver):
+    
+    def __init__(self, device, touch_cal=None, 
+                 startup_rotation=lv.DISPLAY_ROTATION._0, debug=False):
+        print("=== AXS15231.__init__ START ===", file=sys.stderr)
+        self._device = device
+        
+        super().__init__(touch_cal, startup_rotation, debug)
+        
+        print("=== AXS15231.__init__ END ===", file=sys.stderr)
+    
+    def _read_data(self):
+        print("_read_data called", file=sys.stderr)
+        
+        self._device.write(self._tx_mv)
+        self._device.read(buf=self._sensor_data_buffer)
+        
+        print(f"I2C data: {[hex(b) for b in self._sensor_data_buffer]}", 
+              file=sys.stderr)
+        
+        # ... rest of method ...
+        
+        return touch_points
+    
+    def _get_coords(self):
+        print("_get_coords called", file=sys.stderr)
+        
+        touch_data = self._read_data()
+        
+        if touch_data:
+            print(f"Touch detected: x={touch_data[0].x}, y={touch_data[0].y}", 
+                  file=sys.stderr)
+        else:
+            print("No touch detected", file=sys.stderr)
+        
+        return self.__last_state, self.__last_x, self.__last_y
+```
+
+**Watch serial output to see:**
+1. Is `__init__` called? (driver created)
+2. Is `_get_coords` called? (LVGL polling)
+3. Is `_read_data` called? (I2C communication)
+4. What data is received? (I2C bytes)
+
+### Comparison: MicroPython vs C/C++ Debugging
+
+| Feature | MicroPython | C/C++ (Arduino/ESP-IDF) |
+|---------|-------------|------------------------|
+| **Breakpoints** | ❌ No | ✅ Yes |
+| **Step-through** | ❌ No | ✅ Yes |
+| **Variable inspection** | ⚠️ Print only | ✅ Real-time |
+| **Call stack** | ⚠️ Exception only | ✅ Always |
+| **Memory viewer** | ❌ No | ✅ Yes |
+| **Register viewer** | ❌ No | ✅ Yes |
+| **REPL** | ✅ Yes | ❌ No |
+| **Interactive testing** | ✅ Yes | ❌ No |
+| **Quick iteration** | ✅ Fast | ⚠️ Slower |
+
+### When to Use Each
+
+**Use MicroPython when:**
+- Rapid prototyping
+- Python expertise
+- Quick iteration important
+- **Can debug with print statements**
+
+**Use C/C++ when:**
+- Need hardware debugging
+- Complex bugs
+- Performance critical
+- **Need breakpoints and step-through**
+
+### Alternative: Debug C Firmware, Use from Python
+
+**Best of both worlds:**
+
+1. **Debug C driver with GDB:**
+   - Build custom firmware with debug symbols
+   - Set breakpoints in C code
+   - Step through pointer_framework
+   - Find where LVGL stops calling callbacks
+
+2. **Use from Python:**
+   - Once C code works, use from MicroPython
+   - Python code is simpler
+   - Faster development
+
+**This is why we created BUILD_MICROPYTHON_FIRMWARE.md** - to enable debugging the C firmware layer where the touch bug likely exists.
+
+---
+
 ## Summary
 
 ### What You've Built

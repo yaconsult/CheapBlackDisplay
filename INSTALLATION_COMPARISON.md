@@ -16,6 +16,7 @@ This document compares all installation options for flashing code to the JC3248W
 | **PlatformIO CLI** | 3-4 GB | 15-20 min | Medium | ✅ Full GDB | Professional development |
 | **PlatformIO IDE** | 4-5 GB | 20-30 min | Easy | ✅ Visual debugger | Full IDE experience |
 | **ESP-IDF (Official SDK)** | 3-5 GB | 20-30 min | Hard | ✅ Full GDB + OpenOCD | Native ESP32 development, maximum control |
+| **MicroPython** | 10 MB | 5 min | Easy | ⚠️ REPL only | Python scripting, rapid prototyping |
 
 ---
 
@@ -926,6 +927,12 @@ du -sh ~/.arduino15/ ~/.platformio/ ~/Arduino/
 - Native ESP32 development
 - Professional embedded projects
 - Maximum hardware access
+
+### Situation 6: "I want to use Python"
+→ **MicroPython** (10 MB, easy)
+- Python scripting
+- Rapid prototyping
+- **Note:** Limited debugging (REPL only, no breakpoints)
 
 ---
 

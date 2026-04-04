@@ -49,6 +49,7 @@ The ESP32-S3 has **USB JTAG built into the chip**:
 | **PlatformIO IDE** | ✅ | ✅ | ✅ | ✅ | Easy |
 | **ESP-IDF + GDB** | ✅ | ✅ | ✅ | ❌ | Hard |
 | **VS Code + ESP-IDF** | ✅ | ✅ | ✅ | ✅ | Medium |
+| **MicroPython** | ❌ | ❌ | ❌ | ⚠️ | Easy |
 
 ---
 
@@ -590,6 +591,126 @@ kill <PID>
 - Steeper learning curve
 - Command-line only
 - More complex setup
+
+---
+
+## MicroPython Debugging Limitations
+
+### Important: No Hardware Debugging
+
+**MicroPython does NOT support hardware debugging:**
+- ❌ No breakpoints
+- ❌ No step-through debugging  
+- ❌ No variable inspection via debugger
+- ❌ Cannot use GDB/OpenOCD with Python code
+- ❌ Built-in USB JTAG not accessible from Python
+
+### Why?
+
+MicroPython is an **interpreter** running on the firmware:
+- Python code interpreted at runtime
+- No direct mapping to machine code
+- Hardware debugger sees C firmware, not Python
+- Would need Python-aware debugger (doesn't exist)
+
+### Available Methods
+
+#### 1. Print Statements
+
+```python
+def _get_coords(self):
+    print("_get_coords called", file=sys.stderr)
+    print(f"x={self.x}, y={self.y}", file=sys.stderr)
+    return self.state, self.x, self.y
+```
+
+#### 2. REPL (Interactive Shell)
+
+```python
+>>> import axs15231
+>>> touch = axs15231.AXS15231(device)
+>>> touch._get_coords()
+(0, -1, -1)
+```
+
+#### 3. Exception Tracebacks
+
+```python
+Traceback (most recent call last):
+  File "main.py", line 42, in <module>
+  File "axs15231.py", line 67, in _get_coords
+AttributeError: 'NoneType' object has no attribute 'x'
+```
+
+#### 4. Logging
+
+```python
+import logging
+logger = logging.getLogger(__name__)
+logger.debug("Touch data: %s", touch_data)
+```
+
+### Debugging the Touch Issue
+
+**For the MicroPython touch bug, use print statements:**
+
+```python
+# In axs15231.py
+import sys
+
+def _get_coords(self):
+    print(">>> _get_coords called", file=sys.stderr)
+    # If this never prints, LVGL isn't calling the driver
+    
+    touch_data = self._read_data()
+    if touch_data:
+        print(f">>> Touch: x={touch_data[0].x}, y={touch_data[0].y}", 
+              file=sys.stderr)
+    
+    return self.__last_state, self.__last_x, self.__last_y
+```
+
+**If `_get_coords` is never called:**
+- LVGL v9 isn't polling input device
+- Bug is in C firmware (pointer_framework)
+- **Need to debug C code with GDB**
+
+### Debugging C Firmware Instead
+
+**To debug the underlying C code:**
+
+1. Build custom firmware (see BUILD_MICROPYTHON_FIRMWARE.md)
+2. Add debug output to C code
+3. Use GDB to debug pointer_framework
+4. Find where LVGL stops calling callbacks
+5. Fix C code
+6. Rebuild firmware
+7. Use from Python
+
+**This is the recommended approach for the touch bug** - the issue is in the C firmware layer, not Python code.
+
+### Comparison
+
+| Capability | MicroPython | C/C++ |
+|------------|-------------|-------|
+| Breakpoints | ❌ | ✅ |
+| Step-through | ❌ | ✅ |
+| Variable inspection | Print only | Real-time |
+| Hardware debugging | ❌ | ✅ |
+| REPL | ✅ | ❌ |
+| Quick iteration | ✅ | ⚠️ |
+
+### Recommendation
+
+**For complex bugs like the touch issue:**
+1. Use C/C++ with hardware debugging
+2. Fix the firmware
+3. Then use MicroPython for application code
+
+**For simple Python bugs:**
+- Print statements usually sufficient
+- REPL for interactive testing
+- Exception tracebacks show errors
 
 ---
 
