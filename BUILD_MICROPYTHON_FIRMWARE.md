@@ -60,13 +60,25 @@ A custom MicroPython firmware that includes:
 
 ### System Requirements
 
-- **OS:** Linux (Ubuntu 20.04+ recommended)
+- **OS:** Linux (Fedora, Ubuntu, or other)
 - **RAM:** 4 GB minimum, 8 GB recommended
 - **Disk Space:** 10-15 GB free
 - **Internet:** Stable connection for downloads
 
 ### Required Software
 
+**For Fedora:**
+```bash
+# Install build dependencies
+sudo dnf install -y \
+    git wget flex bison gperf python3 python3-pip python3-virtualenv \
+    cmake ninja-build ccache libffi-devel openssl-devel dfu-util \
+    libusb1-devel gcc gcc-c++ make readline-devel ncurses-devel \
+    xz-devel tk-devel libxml2-devel xmlsec1-devel \
+    libffi-devel xz-devel
+```
+
+**For Ubuntu/Debian:**
 ```bash
 # Update package list
 sudo apt-get update
@@ -87,6 +99,10 @@ sudo apt-get install -y \
 python3 --version
 
 # If older, install Python 3.10
+# Fedora:
+sudo dnf install python3.10
+
+# Ubuntu/Debian:
 sudo apt-get install python3.10 python3.10-venv
 ```
 
@@ -135,9 +151,15 @@ mkdir -p ~/micropython_build
 cd ~/micropython_build
 
 # Install ESP-IDF dependencies
-sudo apt-get install -y git wget flex bison gperf python3 \
-  python3-pip python3-venv cmake ninja-build ccache \
-  libffi-dev libssl-dev dfu-util libusb-1.0-0
+# Fedora:
+sudo dnf install -y git wget flex bison gperf python3 \
+  python3-pip python3-virtualenv cmake ninja-build ccache \
+  libffi-devel openssl-devel dfu-util libusb1-devel
+
+# Ubuntu/Debian:
+# sudo apt-get install -y git wget flex bison gperf python3 \
+#   python3-pip python3-venv cmake ninja-build ccache \
+#   libffi-dev libssl-dev dfu-util libusb-1.0-0
 ```
 
 ### Step 2: Check Available Space
@@ -742,6 +764,10 @@ git submodule update --init --recursive
 
 ```bash
 # Install Python 3.10
+# Fedora:
+sudo dnf install python3.10
+
+# Ubuntu/Debian:
 sudo apt-get install python3.10 python3.10-venv
 
 # Use it for build

@@ -70,6 +70,9 @@ newgrp dialout
 
 # Verify permissions
 ls -l /dev/ttyACM*
+
+# On Fedora, you may also need to add to uucp group:
+sudo usermod -a -G uucp $USER
 ```
 
 ---

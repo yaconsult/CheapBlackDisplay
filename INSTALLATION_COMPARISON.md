@@ -167,6 +167,10 @@ chmod +x arduino-ide_2.3.2_Linux_64bit.AppImage
 
 **Method B: Package Manager**
 ```bash
+# Fedora:
+sudo dnf install arduino
+
+# Ubuntu/Debian:
 sudo apt install arduino
 # Older version (1.8.x), smaller size (~200 MB)
 ```
@@ -349,11 +353,25 @@ Total:                ~3-5 GB
 ### Installation
 
 **Prerequisites:**
+
+**For Fedora:**
 ```bash
-# Install dependencies
+sudo dnf install git wget flex bison gperf python3 python3-pip \
+  python3-virtualenv cmake ninja-build ccache libffi-devel openssl-devel \
+  dfu-util libusb1-devel gcc gcc-c++ make
+
+# USB permissions
+sudo usermod -a -G dialout,uucp $USER
+```
+
+**For Ubuntu/Debian:**
+```bash
 sudo apt-get install git wget flex bison gperf python3 python3-pip \
   python3-venv cmake ninja-build ccache libffi-dev libssl-dev \
   dfu-util libusb-1.0-0
+
+# USB permissions
+sudo usermod -a -G dialout $USER
 ```
 
 **Install ESP-IDF:**

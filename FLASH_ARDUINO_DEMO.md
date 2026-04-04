@@ -56,6 +56,10 @@ df -h ~
 # Latest version (Arduino IDE 2.x): ~400 MB download, ~600 MB installed
 
 # Option B: Package manager (older version 1.x)
+# Fedora:
+sudo dnf install arduino
+
+# Ubuntu/Debian:
 sudo apt install arduino
 # Size: ~200 MB installed
 

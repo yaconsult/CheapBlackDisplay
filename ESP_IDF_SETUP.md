@@ -38,13 +38,23 @@ Total:                ~3-5 GB
 
 ### System Packages
 
+**For Fedora:**
 ```bash
-# Ubuntu/Debian
+sudo dnf install git wget flex bison gperf python3 python3-pip \
+  python3-virtualenv cmake ninja-build ccache libffi-devel openssl-devel \
+  dfu-util libusb1-devel gcc gcc-c++ make
+
+# USB permissions
+sudo usermod -a -G dialout $USER
+```
+
+**For Ubuntu/Debian:**
+```bash
 sudo apt-get install git wget flex bison gperf python3 python3-pip \
   python3-venv cmake ninja-build ccache libffi-dev libssl-dev \
   dfu-util libusb-1.0-0
 
-# Additional for USB permissions
+# USB permissions
 sudo usermod -a -G dialout $USER
 ```
 
@@ -564,11 +574,19 @@ xtensa-esp32s3-elf-gdb build/jc3248w535_demo.elf
 
 **Error: "CMake not found"**
 ```bash
+# Fedora:
+sudo dnf install cmake
+
+# Ubuntu/Debian:
 sudo apt-get install cmake
 ```
 
 **Error: "Ninja not found"**
 ```bash
+# Fedora:
+sudo dnf install ninja-build
+
+# Ubuntu/Debian:
 sudo apt-get install ninja-build
 ```
 
