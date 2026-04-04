@@ -211,8 +211,47 @@ git submodule status
 # - lib/lv_bindings
 # - lib/lvgl
 # - lib/micropython
-# - esp-idf (if using ESP32)
 ```
+
+### Step 3: Install ESP-IDF
+
+**ESP-IDF is NOT included as a submodule and must be installed separately.**
+
+```bash
+# You should be in lvgl_micropython root
+cd ~/micropython_build/lvgl_micropython
+
+# Verify you're in the right place
+pwd
+# Should show: .../micropython_build/lvgl_micropython
+
+# Clone ESP-IDF v5.0.4 (required version)
+git clone -b v5.0.4 --recursive https://github.com/espressif/esp-idf.git
+
+# Navigate to ESP-IDF directory
+cd esp-idf
+
+# Install ESP-IDF tools for ESP32-S3
+./install.sh esp32s3
+
+# This will download and install:
+# - Xtensa ESP32-S3 toolchain
+# - ESP32-S3 build tools
+# - Python dependencies
+# Time: 5-10 minutes
+
+# Verify installation completed
+ls -la
+# Should show: install.sh, export.sh, components/, tools/, etc.
+
+# Return to lvgl_micropython root
+cd ~/micropython_build/lvgl_micropython
+
+# Verify esp-idf directory exists
+ls -la esp-idf/
+```
+
+**Important:** You must run `source esp-idf/export.sh` before every build to set up the toolchain environment.
 
 ---
 
