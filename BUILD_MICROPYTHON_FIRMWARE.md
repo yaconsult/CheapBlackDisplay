@@ -244,8 +244,14 @@ python3 --version
 python3.11 -m ensurepip --upgrade
 python3.11 -m pip install --upgrade pip
 
+# IMPORTANT: Remove any existing ESP-IDF virtual environment
+# (in case you have incompatible package versions)
+rm -rf ~/.espressif/python_env/idf5.0_py3.11_env
+
 # Install ESP-IDF tools for ESP32-S3
 ./install.sh esp32s3
+
+# This will create a fresh virtual environment with correct package versions
 
 # This will download and install:
 # - Xtensa ESP32-S3 toolchain
