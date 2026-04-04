@@ -240,6 +240,10 @@ sudo alternatives --set python3 /usr/bin/python3.11
 python3 --version
 # Should show: Python 3.11.x
 
+# Ensure pip is installed for Python 3.11
+python3.11 -m ensurepip --upgrade
+python3.11 -m pip install --upgrade pip
+
 # Install ESP-IDF tools for ESP32-S3
 ./install.sh esp32s3
 
