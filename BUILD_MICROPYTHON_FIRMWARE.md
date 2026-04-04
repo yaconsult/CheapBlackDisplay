@@ -232,7 +232,8 @@ git clone -b v5.0.4 --recursive https://github.com/espressif/esp-idf.git
 cd esp-idf
 
 # Install ESP-IDF tools for ESP32-S3
-./install.sh esp32s3
+# Use python3.11 if you have Python 3.12+
+python3.11 ./install.sh esp32s3
 
 # This will download and install:
 # - Xtensa ESP32-S3 toolchain
@@ -961,8 +962,8 @@ pwd
 ```bash
 # You should be in lvgl_micropython root
 # Build for our custom board
-python3 make.py esp32 BOARD=ESP32_GENERIC_S3_JC3248W535 BOARD_VARIANT=SPIRAM_OCT --flash-size=16
-# 5. Create firmware .bin file
+# Use python3.11 if you have Python 3.12+
+python3.11 make.py esp32 BOARD=ESP32_GENERIC_S3_JC3248W535 BOARD_VARIANT=SPIRAM_OCT --flash-size=16
 ```
 
 **Build time:** 30-60 minutes first time
