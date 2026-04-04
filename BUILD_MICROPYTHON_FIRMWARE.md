@@ -1035,8 +1035,8 @@ pwd
 ```bash
 # You should be in lvgl_micropython root
 # Build for our custom board
-# Use python3.11 if you have Python 3.12+
-python3.11 make.py esp32 BOARD=ESP32_GENERIC_S3_JC3248W535 BOARD_VARIANT=SPIRAM_OCT --flash-size=16
+# Note: No BOARD_VARIANT needed - SPIRAM config is in sdkconfig.board
+python3.11 make.py esp32 BOARD=ESP32_GENERIC_S3_JC3248W535
 ```
 
 **Build time:** 30-60 minutes first time
