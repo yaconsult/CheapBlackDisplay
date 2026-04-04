@@ -220,31 +220,62 @@ git submodule status
 
 ### Understanding the Build System
 
-The lvgl_micropython project uses:
-- **make.py** - Main build script
-- **Board definitions** - In `boards/` directory
-- **ESP-IDF** - For ESP32 compilation
-- **lv_bindings** - LVGL Python bindings
+The lvgl_micropython repository has this structure:
 
-### Step 1: Check Existing Board Definitions
-
-```bash
-cd ~/micropython_build/lvgl_micropython
-
-# List available boards
-ls boards/
-
-# Look for ESP32-S3 boards
-ls boards/ | grep -i s3
+```
+~/micropython_build/lvgl_micropython/
+├── lib/
+│   └── micropython/              # MicroPython submodule
+│       └── ports/
+│           └── esp32/
+│               └── boards/       # <-- Board definitions go here
+│                   ├── ESP32_GENERIC/
+│                   ├── ESP32_GENERIC_S3/
+│                   └── ... (other boards)
+├── ext_mod/
+└── ...
 ```
 
-### Step 2: Create Board Definition for JC3248W535
+**Important:** Board definitions are NOT in `lvgl_micropython/boards/`, they are in:
+```
+lvgl_micropython/lib/micropython/ports/esp32/boards/
+```
+
+### Step 1: Navigate to the Boards Directory
 
 ```bash
-# Create board directory
-mkdir -p boards/ESP32_GENERIC_S3_JC3248W535
+# From lvgl_micropython root
+cd ~/micropython_build/lvgl_micropython
 
-cd boards/ESP32_GENERIC_S3_JC3248W535
+# Navigate to the ESP32 boards directory
+cd lib/micropython/ports/esp32/boards
+
+# Verify you're in the right place
+pwd
+# Should show: .../lvgl_micropython/lib/micropython/ports/esp32/boards
+
+# List available boards
+ls
+# Should show: ESP32_GENERIC, ESP32_GENERIC_S3, etc.
+```
+
+### Step 2: Create Board Directory
+
+```bash
+# Create new board directory (you should still be in the boards/ directory)
+mkdir ESP32_GENERIC_S3_JC3248W535
+
+# Create modules subdirectory for drivers
+mkdir ESP32_GENERIC_S3_JC3248W535/modules
+
+# Verify structure
+ls -la ESP32_GENERIC_S3_JC3248W535/
+# Should show the modules/ directory
+```
+
+**Note:** All subsequent paths in this guide are relative to:
+```
+~/micropython_build/lvgl_micropython/lib/micropython/ports/esp32/
 ```
 
 ### Step 3: Create sdkconfig.board
@@ -295,7 +326,14 @@ set(SDKCONFIG_DEFAULTS
 set(MICROPY_FROZEN_MANIFEST ${MICROPY_BOARD_DIR}/manifest.py)
 ```
 
-### Step 5: Create mpconfigboard.h
+### Step 6: Create mpconfigboard.h
+
+**Location:** `boards/ESP32_GENERIC_S3_JC3248W535/mpconfigboard.h`
+
+```bash
+# You should still be in the board directory
+nano mpconfigboard.h
+```
 
 Create `mpconfigboard.h` with all pin definitions from Arduino code:
 
@@ -346,9 +384,16 @@ Create `mpconfigboard.h` with all pin definitions from Arduino code:
 #define MICROPY_HW_LCD_BL_PWM_RESOLUTION    (10)    // 10-bit (0-1023)
 ```
 
-### Step 6: Create lv_conf.h for LVGL Configuration
+### Step 7: Create lv_conf.h for LVGL Configuration
 
-Create `boards/ESP32_GENERIC_S3_JC3248W535/lv_conf.h` with board-specific LVGL settings from Arduino:
+**Location:** `boards/ESP32_GENERIC_S3_JC3248W535/lv_conf.h`
+
+```bash
+# You should still be in the board directory
+nano lv_conf.h
+```
+
+Create `lv_conf.h` with board-specific LVGL settings from Arduino:
 
 ```c
 /**
@@ -522,7 +567,14 @@ Create `boards/ESP32_GENERIC_S3_JC3248W535/lv_conf.h` with board-specific LVGL s
 - **LV_DPI_DEF 130** - DPI setting for 320x480 display
 - **LV_MEM_CUSTOM 1** - Use system malloc (PSRAM available)
 
-### Step 7: Create manifest.py
+### Step 8: Create manifest.py
+
+**Location:** `boards/ESP32_GENERIC_S3_JC3248W535/manifest.py`
+
+```bash
+# You should still be in the board directory
+nano manifest.py
+```
 
 Create `manifest.py` to include drivers:
 
@@ -533,9 +585,16 @@ include("$(PORT_DIR)/boards/manifest.py")
 freeze("$(BOARD_DIR)/modules")
 ```
 
-### Step 8: Create Partition Table
+### Step 9: Create Partition Table
 
-Create `partitions.csv`:
+**Location:** `boards/ESP32_GENERIC_S3_JC3248W535/partitions.csv`
+
+```bash
+# You should still be in the board directory
+nano partitions.csv
+```
+
+Create `partitions.csv` with this content:
 
 ```csv
 # Name,   Type, SubType, Offset,  Size, Flags
@@ -551,11 +610,14 @@ vfs,      data, fat,     0x310000,0xCF0000,
 
 ### Step 1: Copy AXS15231B Driver
 
-```bash
-cd ~/micropython_build/lvgl_micropython
+**Location:** `boards/ESP32_GENERIC_S3_JC3248W535/modules/`
 
-# Create drivers directory
-mkdir -p boards/ESP32_GENERIC_S3_JC3248W535/modules
+```bash
+# Navigate back to the ESP32 port directory
+cd ~/micropython_build/lvgl_micropython/lib/micropython/ports/esp32
+
+# Verify the modules directory exists
+ls -la boards/ESP32_GENERIC_S3_JC3248W535/modules/
 
 # Copy driver from existing firmware
 cp ~/PycharmProjects/CheapBlackDisplay/ESP32-JC3248W535-Micropython-LVGL-main/lib/axs15231b.py \
@@ -568,7 +630,17 @@ cp ~/PycharmProjects/CheapBlackDisplay/ESP32-JC3248W535-Micropython-LVGL-main/li
 
 ### Step 2: Add Display Configuration
 
-The Arduino code includes extensive display initialization commands. Create `boards/ESP32_GENERIC_S3_JC3248W535/modules/axs15231b_config.py`:
+**Location:** `boards/ESP32_GENERIC_S3_JC3248W535/modules/axs15231b_config.py`
+
+The Arduino code includes extensive display initialization commands.
+
+```bash
+# You should be in the esp32 port directory
+cd boards/ESP32_GENERIC_S3_JC3248W535/modules
+nano axs15231b_config.py
+```
+
+Create `axs15231b_config.py` with this content:
 
 ```python
 """
@@ -618,6 +690,10 @@ QSPI_MODE = 3            # SPI mode 3
 ### Step 3: Verify Driver Files
 
 ```bash
+# Navigate back to esp32 port directory
+cd ~/micropython_build/lvgl_micropython/lib/micropython/ports/esp32
+
+# List module files
 ls -la boards/ESP32_GENERIC_S3_JC3248W535/modules/
 
 # Should show:
@@ -633,6 +709,9 @@ ls -la boards/ESP32_GENERIC_S3_JC3248W535/modules/
 ### Step 1: Copy AXS15231 Touch Driver
 
 ```bash
+# Make sure you're in the esp32 port directory
+cd ~/micropython_build/lvgl_micropython/lib/micropython/ports/esp32
+
 # Copy touch driver
 cp ~/PycharmProjects/CheapBlackDisplay/ESP32-JC3248W535-Micropython-LVGL-main/lib/axs15231.py \
    boards/ESP32_GENERIC_S3_JC3248W535/modules/
@@ -640,7 +719,14 @@ cp ~/PycharmProjects/CheapBlackDisplay/ESP32-JC3248W535-Micropython-LVGL-main/li
 
 ### Step 1b: Add Touch Configuration
 
-Create `boards/ESP32_GENERIC_S3_JC3248W535/modules/axs15231_config.py`:
+**Location:** `boards/ESP32_GENERIC_S3_JC3248W535/modules/axs15231_config.py`
+
+```bash
+cd boards/ESP32_GENERIC_S3_JC3248W535/modules
+nano axs15231_config.py
+```
+
+Create `axs15231_config.py` with this content:
 
 ```python
 """
@@ -677,7 +763,14 @@ TOUCH_MIRROR_Y = False   # mirror_y = 0
 
 **This is critical for debugging the touch issue!**
 
-Edit `boards/ESP32_GENERIC_S3_JC3248W535/modules/axs15231.py`:
+**Location:** `boards/ESP32_GENERIC_S3_JC3248W535/modules/axs15231.py`
+
+```bash
+# You should be in the modules directory
+nano axs15231.py
+```
+
+Edit the file to add debug output:
 
 ```python
 # Add at the top
@@ -740,14 +833,9 @@ cd ..
 ### Step 2: Build for JC3248W535
 
 ```bash
-# Build firmware
+# You should be in lvgl_micropython root
+# Build for our custom board
 python3 make.py esp32 BOARD=ESP32_GENERIC_S3_JC3248W535 BOARD_VARIANT=SPIRAM_OCT --flash-size=16
-
-# This will:
-# 1. Configure ESP-IDF
-# 2. Build MicroPython
-# 3. Build LVGL bindings
-# 4. Link everything together
 # 5. Create firmware .bin file
 ```
 
