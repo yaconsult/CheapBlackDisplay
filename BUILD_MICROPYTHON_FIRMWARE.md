@@ -867,22 +867,55 @@ class AXS15231(pointer_framework.PointerDriver):
 
 ## Build Firmware
 
-### Step 1: Set Up Build Environment
+### Step 1: Navigate to Build Directory
 
 ```bash
+# Navigate to the lvgl_micropython root
 cd ~/micropython_build/lvgl_micropython
 
-# Make build script executable
-chmod +x make.py
-
-# Set up ESP-IDF environment
-cd esp-idf
-./install.sh esp32s3
-source export.sh
-cd ..
+# Verify you're in the right place
+pwd
+# Should show: .../micropython_build/lvgl_micropython
 ```
 
-### Step 2: Build for JC3248W535
+### Step 2: Initialize Submodules (if not done already)
+
+```bash
+# Initialize all submodules
+git submodule update --init --recursive
+```
+
+### Step 3: Build MicroPython Cross-Compiler
+
+```bash
+# You should be in lvgl_micropython root
+# Build mpy-cross
+make -C lib/micropython/mpy-cross
+```
+
+### Step 4: Set Up ESP-IDF Environment
+
+**CRITICAL:** You must source the ESP-IDF environment before building:
+
+```bash
+# Navigate to ESP-IDF directory
+cd ~/micropython_build/lvgl_micropython/esp-idf
+
+# Source the environment (sets up toolchain paths)
+source export.sh
+
+# You should see output like:
+# "Done! You can now compile ESP-IDF projects."
+
+# Return to lvgl_micropython root
+cd ~/micropython_build/lvgl_micropython
+
+# Verify you're back in the right place
+pwd
+# Should show: .../micropython_build/lvgl_micropython
+```
+
+### Step 5: Build for JC3248W535
 
 ```bash
 # You should be in lvgl_micropython root
