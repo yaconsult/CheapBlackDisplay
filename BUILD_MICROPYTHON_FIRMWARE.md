@@ -297,10 +297,11 @@ set(MICROPY_FROZEN_MANIFEST ${MICROPY_BOARD_DIR}/manifest.py)
 
 ### Step 5: Create mpconfigboard.h
 
-Create `mpconfigboard.h`:
+Create `mpconfigboard.h` with all pin definitions from Arduino code:
 
 ```c
 // JC3248W535 Board Configuration
+// Based on esp_bsp.h from Arduino demo
 
 #define MICROPY_HW_BOARD_NAME               "ESP32S3 JC3248W535"
 #define MICROPY_HW_MCU_NAME                 "ESP32-S3"
@@ -310,23 +311,39 @@ Create `mpconfigboard.h`:
 // Enable SPIRAM
 #define MICROPY_HW_SPIRAM_SIZE              (8 * 1024 * 1024)  // 8MB
 
-// I2C
-#define MICROPY_HW_I2C0_SCL                 (8)
-#define MICROPY_HW_I2C0_SDA                 (4)
+// I2C Configuration (from esp_bsp.h)
+#define MICROPY_HW_I2C0_NUM                 (0)  // I2C_NUM_0
+#define MICROPY_HW_I2C0_SCL                 (8)  // EXAMPLE_PIN_NUM_QSPI_TOUCH_SCL
+#define MICROPY_HW_I2C0_SDA                 (4)  // EXAMPLE_PIN_NUM_QSPI_TOUCH_SDA
+#define MICROPY_HW_I2C0_SPEED               (400000)  // 400kHz (BSP_I2C_CLK_SPEED_HZ)
 
-// SPI (for QSPI display)
-#define MICROPY_HW_SPI1_SCK                 (47)
-#define MICROPY_HW_SPI1_MOSI                (21)  // DATA0
-#define MICROPY_HW_SPI1_MISO                (48)  // DATA1
+// QSPI Display Pins (from esp_bsp.h)
+#define MICROPY_HW_LCD_QSPI_HOST            (2)  // SPI2_HOST
+#define MICROPY_HW_LCD_CS                   (45)  // EXAMPLE_PIN_NUM_QSPI_CS
+#define MICROPY_HW_LCD_PCLK                 (47)  // EXAMPLE_PIN_NUM_QSPI_PCLK
+#define MICROPY_HW_LCD_DATA0                (21)  // EXAMPLE_PIN_NUM_QSPI_DATA0
+#define MICROPY_HW_LCD_DATA1                (48)  // EXAMPLE_PIN_NUM_QSPI_DATA1
+#define MICROPY_HW_LCD_DATA2                (40)  // EXAMPLE_PIN_NUM_QSPI_DATA2
+#define MICROPY_HW_LCD_DATA3                (39)  // EXAMPLE_PIN_NUM_QSPI_DATA3
+#define MICROPY_HW_LCD_DC                   (8)   // EXAMPLE_PIN_NUM_QSPI_DC
+#define MICROPY_HW_LCD_TE                   (38)  // EXAMPLE_PIN_NUM_QSPI_TE (Tear Effect)
+#define MICROPY_HW_LCD_BL                   (1)   // EXAMPLE_PIN_NUM_QSPI_BL (Backlight)
+#define MICROPY_HW_LCD_RST                  (-1)  // No reset pin
 
-// Display pins
-#define MICROPY_HW_LCD_CS                   (45)
-#define MICROPY_HW_LCD_DC                   (8)
-#define MICROPY_HW_LCD_BL                   (1)
+// Display Resolution
+#define MICROPY_HW_LCD_H_RES                (320)
+#define MICROPY_HW_LCD_V_RES                (480)
 
-// Touch pins (I2C)
-#define MICROPY_HW_TOUCH_SDA                (4)
-#define MICROPY_HW_TOUCH_SCL                (8)
+// Touch Controller Pins (I2C)
+#define MICROPY_HW_TOUCH_SDA                (4)   // EXAMPLE_PIN_NUM_QSPI_TOUCH_SDA
+#define MICROPY_HW_TOUCH_SCL                (8)   // EXAMPLE_PIN_NUM_QSPI_TOUCH_SCL
+#define MICROPY_HW_TOUCH_RST                (-1)  // No reset pin
+#define MICROPY_HW_TOUCH_INT                (-1)  // No interrupt pin
+#define MICROPY_HW_TOUCH_I2C_ADDR           (0x3B)  // AXS15231 I2C address
+
+// Backlight PWM Configuration (from esp_bsp.c)
+#define MICROPY_HW_LCD_BL_PWM_FREQ          (5000)  // 5kHz
+#define MICROPY_HW_LCD_BL_PWM_RESOLUTION    (10)    // 10-bit (0-1023)
 ```
 
 ### Step 6: Create manifest.py
@@ -373,7 +390,56 @@ cp ~/PycharmProjects/CheapBlackDisplay/ESP32-JC3248W535-Micropython-LVGL-main/li
    boards/ESP32_GENERIC_S3_JC3248W535/modules/
 ```
 
-### Step 2: Verify Driver Files
+### Step 2: Add Display Configuration
+
+The Arduino code includes extensive display initialization commands. Create `boards/ESP32_GENERIC_S3_JC3248W535/modules/axs15231b_config.py`:
+
+```python
+"""
+AXS15231B Display Initialization Commands
+Derived from Arduino demo esp_bsp.c
+"""
+
+# Display initialization commands from C code
+# These are the exact commands used by the working Arduino firmware
+LCD_INIT_CMDS = [
+    # Format: (register, data_bytes, delay_ms)
+    (0xBB, bytes([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5A, 0xA5]), 0),
+    (0xA0, bytes([0xC0, 0x10, 0x00, 0x02, 0x00, 0x00, 0x04, 0x3F, 0x20, 0x05, 
+                  0x3F, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x00]), 0),
+    # ... (67 total initialization commands from esp_bsp.c)
+    # See full list in Arduino code
+]
+
+# I2C Configuration
+I2C_SPEED_HZ = 400000  # 400kHz from BSP_I2C_CLK_SPEED_HZ
+
+# Display Resolution
+LCD_H_RES = 320
+LCD_V_RES = 480
+
+# Backlight PWM
+BL_PWM_FREQ = 5000      # 5kHz
+BL_PWM_RESOLUTION = 10  # 10-bit (0-1023)
+
+# Tear Effect Configuration (from esp_bsp.c)
+# TE pin is GPIO 38, triggers on negative edge
+TE_GPIO = 38
+TE_INTR_TYPE = 'negedge'  # GPIO_INTR_NEGEDGE
+
+# SPI/QSPI Configuration
+QSPI_FREQ_HZ = 80000000  # 80MHz (common for this display)
+QSPI_MODE = 3            # SPI mode 3
+```
+
+**Note:** The full 67 initialization commands are in `esp_bsp.c` lines 34-67. These configure:
+- Display timing
+- Gamma correction
+- Power settings
+- Interface mode (QSPI)
+- Color settings
+
+### Step 3: Verify Driver Files
 
 ```bash
 ls -la boards/ESP32_GENERIC_S3_JC3248W535/modules/
@@ -381,6 +447,7 @@ ls -la boards/ESP32_GENERIC_S3_JC3248W535/modules/
 # Should show:
 # axs15231b.py
 # _axs15231b_init.py
+# axs15231b_config.py (new)
 ```
 
 ---
@@ -393,6 +460,41 @@ ls -la boards/ESP32_GENERIC_S3_JC3248W535/modules/
 # Copy touch driver
 cp ~/PycharmProjects/CheapBlackDisplay/ESP32-JC3248W535-Micropython-LVGL-main/lib/axs15231.py \
    boards/ESP32_GENERIC_S3_JC3248W535/modules/
+```
+
+### Step 1b: Add Touch Configuration
+
+Create `boards/ESP32_GENERIC_S3_JC3248W535/modules/axs15231_config.py`:
+
+```python
+"""
+AXS15231 Touch Controller Configuration
+Derived from Arduino demo esp_bsp.c
+"""
+
+# I2C Configuration (from esp_bsp.c bsp_i2c_init)
+I2C_NUM = 0              # I2C_NUM_0 (BSP_I2C_NUM)
+I2C_SDA = 4              # EXAMPLE_PIN_NUM_QSPI_TOUCH_SDA
+I2C_SCL = 8              # EXAMPLE_PIN_NUM_QSPI_TOUCH_SCL
+I2C_SPEED = 400000       # 400kHz (BSP_I2C_CLK_SPEED_HZ)
+I2C_ADDR = 0x3B          # AXS15231 I2C address
+
+# Touch Configuration (from esp_bsp.c bsp_touch_new)
+TOUCH_X_MAX = 320        # EXAMPLE_LCD_QSPI_H_RES
+TOUCH_Y_MAX = 480        # EXAMPLE_LCD_QSPI_V_RES
+TOUCH_RST_GPIO = -1      # EXAMPLE_PIN_NUM_QSPI_TOUCH_RST (not used)
+TOUCH_INT_GPIO = -1      # EXAMPLE_PIN_NUM_QSPI_TOUCH_INT (not used)
+
+# Touch Flags (from esp_bsp.c tp_cfg.flags)
+TOUCH_SWAP_XY = False    # swap_xy = 0
+TOUCH_MIRROR_X = False   # mirror_x = 0
+TOUCH_MIRROR_Y = False   # mirror_y = 0
+
+# Rotation Handling (from esp_bsp.c bsp_touch_process_points_cb)
+# The Arduino code handles rotation in bsp_touch_process_points_cb
+# For LV_DISP_ROT_90 (our default):
+#   x_new = y
+#   y_new = x_max - x
 ```
 
 ### Step 2: Add Debug Output to Touch Driver
@@ -890,6 +992,120 @@ python3 make.py esp32 BOARD=ESP32_GENERIC_S3_JC3248W535 BOARD_VARIANT=SPIRAM_OCT
 
 # Flash and test
 ```
+
+---
+
+## Important Configuration Details from Arduino Code
+
+### What We Learned from esp_bsp.c
+
+The Arduino demo provides critical configuration details:
+
+#### 1. I2C Configuration
+```c
+// From esp_bsp.c lines 96-103
+.mode = I2C_MODE_MASTER,
+.sda_io_num = 4,              // GPIO 4
+.scl_io_num = 8,              // GPIO 8
+.sda_pullup_en = DISABLE,     // No internal pullup
+.scl_pullup_en = DISABLE,     // No internal pullup
+.master.clk_speed = 400000    // 400kHz
+```
+
+**Key insight:** No internal pullups - board has external pullups.
+
+#### 2. Display Initialization
+```c
+// From esp_bsp.c lines 34-67
+// 67 initialization commands configure:
+// - Display timing and sync
+// - Gamma correction curves
+// - Power management
+// - QSPI interface mode
+// - Color depth and format
+```
+
+**These commands are critical** - they configure the AXS15231B display controller for proper operation.
+
+#### 3. Tear Effect (TE) Synchronization
+```c
+// From esp_bsp.c lines 266-304
+.te_gpio_num = 38,                    // GPIO 38
+.tear_intr_type = GPIO_INTR_NEGEDGE,  // Trigger on falling edge
+.time_Tvdl = calculated,              // Display update time
+.time_Tvdh = calculated,              // Display idle time
+```
+
+**Purpose:** Prevents tearing by synchronizing display updates with panel refresh.
+
+#### 4. Backlight PWM
+```c
+// From esp_bsp.c lines 125-143
+.gpio_num = 1,                        // GPIO 1
+.speed_mode = LEDC_LOW_SPEED_MODE,
+.timer_num = 1,
+.duty_resolution = LEDC_TIMER_10_BIT, // 10-bit (0-1023)
+.freq_hz = 5000,                      // 5kHz PWM
+```
+
+**Brightness control:** 0-100% maps to 0-1023 duty cycle.
+
+#### 5. Touch Processing
+```c
+// From esp_bsp.c lines 407-427
+// Rotation handled in bsp_touch_process_points_cb
+// For 90° rotation:
+x_new = y
+y_new = x_max - x
+
+// For 180° rotation:
+x_new = x_max - x
+y_new = y_max - y
+
+// For 270° rotation:
+x_new = y_max - y
+y_new = x
+```
+
+**Important:** Touch coordinates must be rotated to match display rotation.
+
+#### 6. LVGL Integration
+```c
+// From esp_bsp.c lines 498-511
+// Touch added to LVGL with:
+lvgl_port_touch_cfg_t touch_cfg = {
+    .disp = disp,
+    .handle = tp,
+    .touch_wait_cb = bsp_touch_sync_cb,  // Synchronization callback
+};
+return lvgl_port_add_touch(&touch_cfg);
+```
+
+**Key:** `touch_wait_cb` provides synchronization between touch interrupts and LVGL polling.
+
+### Configuration Checklist
+
+When building MicroPython firmware, ensure:
+
+- ✅ **I2C speed:** 400kHz (not default 100kHz)
+- ✅ **I2C pullups:** Disabled (external pullups on board)
+- ✅ **Display init commands:** All 67 commands from esp_bsp.c
+- ✅ **Tear effect:** GPIO 38, negative edge trigger
+- ✅ **Backlight PWM:** 5kHz, 10-bit resolution
+- ✅ **Touch rotation:** Coordinate transformation for display rotation
+- ✅ **Touch I2C address:** 0x3B
+- ✅ **QSPI mode:** 4-wire QSPI, not standard SPI
+
+### Missing from MicroPython Firmware?
+
+**Possible issues:**
+1. **Display init commands** - May be incomplete or incorrect
+2. **Tear effect sync** - May not be implemented
+3. **Touch synchronization** - `touch_wait_cb` equivalent missing?
+4. **I2C speed** - May be using wrong speed
+5. **Rotation handling** - Touch coordinates may not be transformed
+
+**This is why touch might not work** - the MicroPython firmware may be missing critical configuration from the Arduino code.
 
 ---
 
