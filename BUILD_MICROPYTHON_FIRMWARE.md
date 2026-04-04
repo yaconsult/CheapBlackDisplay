@@ -346,7 +346,183 @@ Create `mpconfigboard.h` with all pin definitions from Arduino code:
 #define MICROPY_HW_LCD_BL_PWM_RESOLUTION    (10)    // 10-bit (0-1023)
 ```
 
-### Step 6: Create manifest.py
+### Step 6: Create lv_conf.h for LVGL Configuration
+
+Create `boards/ESP32_GENERIC_S3_JC3248W535/lv_conf.h` with board-specific LVGL settings from Arduino:
+
+```c
+/**
+ * LVGL Configuration for JC3248W535
+ * Based on Arduino demo lv_conf.h
+ */
+
+#if 1 /*Set it to "1" to enable content*/
+
+#ifndef LV_CONF_H
+#define LV_CONF_H
+
+/*====================
+   COLOR SETTINGS
+ *====================*/
+
+/* Color depth: 16 (RGB565) - CRITICAL for this display */
+#define LV_COLOR_DEPTH 16
+
+/* Swap the 2 bytes of RGB565 color - REQUIRED for QSPI interface */
+#define LV_COLOR_16_SWAP 1
+
+/* Enable transparent background support */
+#define LV_COLOR_SCREEN_TRANSP 1
+
+/* Color mix rounding */
+#define LV_COLOR_MIX_ROUND_OFS 0
+
+/* Chroma key color (pure green) */
+#define LV_COLOR_CHROMA_KEY lv_color_hex(0x00ff00)
+
+/*=========================
+   MEMORY SETTINGS
+ *=========================*/
+
+/* Use custom malloc/free (system malloc) */
+#define LV_MEM_CUSTOM 1
+#if LV_MEM_CUSTOM == 1
+    #define LV_MEM_CUSTOM_INCLUDE <stdlib.h>
+    #define LV_MEM_CUSTOM_ALLOC   malloc
+    #define LV_MEM_CUSTOM_FREE    free
+    #define LV_MEM_CUSTOM_REALLOC realloc
+#endif
+
+/* Number of intermediate memory buffers */
+#define LV_MEM_BUF_MAX_NUM 16
+
+/* Use standard memcpy/memset */
+#define LV_MEMCPY_MEMSET_STD 1
+
+/*====================
+   HAL SETTINGS
+ *====================*/
+
+/* Display refresh period - 30ms (33 FPS) */
+#define LV_DISP_DEF_REFR_PERIOD 30
+
+/* Input device read period - 30ms */
+#define LV_INDEV_DEF_READ_PERIOD 30
+
+/* DPI setting for this display */
+#define LV_DPI_DEF 130
+
+/*=======================
+ * FEATURE CONFIGURATION
+ *=======================*/
+
+/* Enable complex draw engine (shadows, gradients, etc.) */
+#define LV_DRAW_COMPLEX 1
+
+/* Layer buffer sizes for transparency */
+#define LV_LAYER_SIMPLE_BUF_SIZE          (24 * 1024)
+#define LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE (3 * 1024)
+
+/* Image cache (disabled for memory savings) */
+#define LV_IMG_CACHE_DEF_SIZE 0
+
+/* Gradient settings */
+#define LV_GRADIENT_MAX_STOPS 2
+#define LV_GRAD_CACHE_DEF_SIZE 0
+#define LV_DITHER_GRADIENT 0
+
+/* Rotation buffer */
+#define LV_DISP_ROT_MAX_BUF (10*1024)
+
+/* GPU acceleration (none for ESP32-S3) */
+#define LV_USE_GPU_ARM2D 0
+#define LV_USE_GPU_STM32_DMA2D 0
+
+/*==================
+ * FONT USAGE
+ *==================*/
+
+/* Enable fonts needed for demos */
+#define LV_FONT_MONTSERRAT_8  0
+#define LV_FONT_MONTSERRAT_10 0
+#define LV_FONT_MONTSERRAT_12 0
+#define LV_FONT_MONTSERRAT_14 1
+#define LV_FONT_MONTSERRAT_16 1
+#define LV_FONT_MONTSERRAT_18 0
+#define LV_FONT_MONTSERRAT_20 1
+#define LV_FONT_MONTSERRAT_22 0
+#define LV_FONT_MONTSERRAT_24 0
+#define LV_FONT_MONTSERRAT_26 0
+#define LV_FONT_MONTSERRAT_28 0
+#define LV_FONT_MONTSERRAT_30 0
+#define LV_FONT_MONTSERRAT_32 0
+#define LV_FONT_MONTSERRAT_34 0
+#define LV_FONT_MONTSERRAT_36 0
+#define LV_FONT_MONTSERRAT_38 0
+#define LV_FONT_MONTSERRAT_40 0
+#define LV_FONT_MONTSERRAT_42 0
+#define LV_FONT_MONTSERRAT_44 0
+#define LV_FONT_MONTSERRAT_46 0
+#define LV_FONT_MONTSERRAT_48 0
+
+/* Default font */
+#define LV_FONT_DEFAULT &lv_font_montserrat_14
+
+/*=================
+ * THEME USAGE
+ *=================*/
+
+/* Enable default theme */
+#define LV_USE_THEME_DEFAULT 1
+#if LV_USE_THEME_DEFAULT
+    /* Dark mode by default */
+    #define LV_THEME_DEFAULT_DARK 0
+    /* Enable grow on press */
+    #define LV_THEME_DEFAULT_GROW 1
+    /* Default transition time */
+    #define LV_THEME_DEFAULT_TRANSITION_TIME 80
+#endif
+
+/*==================
+ * WIDGET USAGE
+ *==================*/
+
+/* Enable all standard widgets for demos */
+#define LV_USE_ARC        1
+#define LV_USE_BAR        1
+#define LV_USE_BTN        1
+#define LV_USE_BTNMATRIX  1
+#define LV_USE_CANVAS     1
+#define LV_USE_CHECKBOX   1
+#define LV_USE_DROPDOWN   1
+#define LV_USE_IMG        1
+#define LV_USE_LABEL      1
+#define LV_USE_LINE       1
+#define LV_USE_ROLLER     1
+#define LV_USE_SLIDER     1
+#define LV_USE_SWITCH     1
+#define LV_USE_TEXTAREA   1
+#define LV_USE_TABLE      1
+
+/*==================
+ * DEMO USAGE
+ *==================*/
+
+/* Enable widgets demo */
+#define LV_USE_DEMO_WIDGETS 1
+
+#endif /*LV_CONF_H*/
+#endif /*End of "Content enable"*/
+```
+
+**Key LVGL settings for this board:**
+- **LV_COLOR_DEPTH 16** - RGB565 color format
+- **LV_COLOR_16_SWAP 1** - CRITICAL: Byte swap for QSPI interface
+- **LV_INDEV_DEF_READ_PERIOD 30** - Touch polling every 30ms
+- **LV_DPI_DEF 130** - DPI setting for 320x480 display
+- **LV_MEM_CUSTOM 1** - Use system malloc (PSRAM available)
+
+### Step 7: Create manifest.py
 
 Create `manifest.py` to include drivers:
 
@@ -357,7 +533,7 @@ include("$(PORT_DIR)/boards/manifest.py")
 freeze("$(BOARD_DIR)/modules")
 ```
 
-### Step 7: Create Partition Table
+### Step 8: Create Partition Table
 
 Create `partitions.csv`:
 
@@ -1106,6 +1282,101 @@ When building MicroPython firmware, ensure:
 5. **Rotation handling** - Touch coordinates may not be transformed
 
 **This is why touch might not work** - the MicroPython firmware may be missing critical configuration from the Arduino code.
+
+### LVGL Configuration from Arduino
+
+The Arduino `lv_conf.h` provides critical LVGL settings:
+
+#### Color Configuration
+```c
+// From lv_conf.h lines 27-30
+#define LV_COLOR_DEPTH 16          // RGB565 format
+#define LV_COLOR_16_SWAP 1         // CRITICAL: Byte swap for QSPI
+```
+
+**Why LV_COLOR_16_SWAP is critical:**
+- QSPI interface expects bytes in specific order
+- Without swap, colors will be wrong (red/blue swapped)
+- This is display hardware-specific
+
+#### Display Settings
+```c
+// From display.h lines 26-38
+#define BSP_LCD_COLOR_FORMAT    ESP_LCD_COLOR_FORMAT_RGB565
+#define BSP_LCD_BIGENDIAN       1
+#define BSP_LCD_BITS_PER_PIXEL  16
+#define BSP_LCD_COLOR_SPACE     ESP_LCD_COLOR_SPACE_RGB
+#define EXAMPLE_LCD_QSPI_H_RES  320
+#define EXAMPLE_LCD_QSPI_V_RES  480
+```
+
+#### Timing Configuration
+```c
+// From lv_conf.h lines 81-84
+#define LV_DISP_DEF_REFR_PERIOD 30    // Display refresh every 30ms
+#define LV_INDEV_DEF_READ_PERIOD 30   // Touch read every 30ms
+#define LV_DPI_DEF 130                // DPI for this display size
+```
+
+**Touch polling period is critical:**
+- 30ms = ~33 Hz polling rate
+- Too fast may overwhelm I2C
+- Too slow may miss touches
+
+#### Tear Effect Timing
+```c
+// From display.h lines 49-50
+.time_Tvdl = 13,    // Display update time (ms)
+.time_Tvdh = 3,     // Display idle time (ms)
+```
+
+**Purpose:** Synchronize display updates to prevent tearing.
+
+#### Memory Configuration
+```c
+// From lv_conf.h lines 49, 139-140
+#define LV_MEM_CUSTOM 1                          // Use system malloc
+#define LV_LAYER_SIMPLE_BUF_SIZE (24 * 1024)     // 24KB layer buffer
+#define LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE (3 * 1024)  // 3KB fallback
+```
+
+**With 8MB PSRAM:** Can use system malloc instead of LVGL's internal allocator.
+
+### LVGL Configuration Checklist
+
+When building MicroPython firmware with LVGL, ensure:
+
+- ✅ **LV_COLOR_DEPTH:** 16 (RGB565)
+- ✅ **LV_COLOR_16_SWAP:** 1 (CRITICAL for QSPI)
+- ✅ **LV_INDEV_DEF_READ_PERIOD:** 30ms (touch polling)
+- ✅ **LV_DISP_DEF_REFR_PERIOD:** 30ms (display refresh)
+- ✅ **LV_DPI_DEF:** 130 (for 320x480 display)
+- ✅ **LV_MEM_CUSTOM:** 1 (use system malloc with PSRAM)
+- ✅ **Buffer sizes:** 24KB layer buffer, 3KB fallback
+- ✅ **Fonts:** Enable Montserrat 14, 16, 20 for demos
+
+### Why These Settings Matter
+
+**LV_COLOR_16_SWAP:**
+- Most critical setting
+- QSPI interface byte order
+- Wrong setting = wrong colors
+
+**Touch polling (30ms):**
+- Matches display refresh
+- Prevents I2C bus overload
+- Balances responsiveness vs performance
+
+**Memory settings:**
+- PSRAM allows larger buffers
+- Smoother animations
+- Better performance
+
+**Missing any of these in MicroPython firmware could cause:**
+1. Wrong colors (no byte swap)
+2. Touch not responding (wrong polling period)
+3. Memory errors (wrong buffer sizes)
+4. Poor performance (wrong refresh rate)
 
 ---
 
