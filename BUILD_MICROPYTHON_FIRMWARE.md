@@ -1036,7 +1036,8 @@ pwd
 # You should be in lvgl_micropython root
 # Build for our custom board
 # Note: No BOARD_VARIANT needed - SPIRAM config is in sdkconfig.board
-python3.11 make.py esp32 BOARD=ESP32_GENERIC_S3_JC3248W535
+# CFLAGS_EXTRA="-Wno-error" needed for GCC 12+ compatibility
+python3.11 make.py esp32 BOARD=ESP32_GENERIC_S3_JC3248W535 CFLAGS_EXTRA="-Wno-error"
 ```
 
 **Build time:** 30-60 minutes first time
