@@ -889,9 +889,11 @@ git submodule update --init --recursive
 
 ```bash
 # You should be in lvgl_micropython root
-# Build mpy-cross
-make -C lib/micropython/mpy-cross
+# Build mpy-cross with warnings disabled (newer GCC versions are strict)
+make -C lib/micropython/mpy-cross CFLAGS_EXTRA="-Wno-error"
 ```
+
+**Note:** The `-Wno-error` flag prevents warnings from being treated as errors. This is needed for newer GCC versions (GCC 12+) that have stricter warnings like "truncates null terminator".
 
 ### Step 4: Set Up ESP-IDF Environment
 
