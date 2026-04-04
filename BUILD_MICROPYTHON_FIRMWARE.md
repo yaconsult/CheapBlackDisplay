@@ -232,8 +232,7 @@ git clone -b v5.0.4 --recursive https://github.com/espressif/esp-idf.git
 cd esp-idf
 
 # Install ESP-IDF tools for ESP32-S3
-# Use python3.11 if you have Python 3.12+
-python3.11 ./install.sh esp32s3
+./install.sh esp32s3
 
 # This will download and install:
 # - Xtensa ESP32-S3 toolchain
