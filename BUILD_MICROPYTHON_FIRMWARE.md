@@ -657,6 +657,13 @@ vfs,      data, fat,     0x310000,0xCF0000,
 # Navigate back to the ESP32 port directory
 cd ~/micropython_build/lvgl_micropython/lib/micropython/ports/esp32
 
+# Verify you're in the right place
+pwd
+# Should show: .../lvgl_micropython/lib/micropython/ports/esp32
+
+# Create modules directory if it doesn't exist
+mkdir -p boards/ESP32_GENERIC_S3_JC3248W535/modules
+
 # Verify the modules directory exists
 ls -la boards/ESP32_GENERIC_S3_JC3248W535/modules/
 
@@ -667,6 +674,10 @@ cp ~/PycharmProjects/CheapBlackDisplay/ESP32-JC3248W535-Micropython-LVGL-main/li
 # Copy initialization
 cp ~/PycharmProjects/CheapBlackDisplay/ESP32-JC3248W535-Micropython-LVGL-main/lib/_axs15231b_init.py \
    boards/ESP32_GENERIC_S3_JC3248W535/modules/
+
+# Verify files were copied
+ls -la boards/ESP32_GENERIC_S3_JC3248W535/modules/
+# Should show: axs15231b.py and _axs15231b_init.py
 ```
 
 ### Step 2: Add Display Configuration
