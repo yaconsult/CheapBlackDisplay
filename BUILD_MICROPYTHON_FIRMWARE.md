@@ -280,6 +280,20 @@ ls -la ESP32_GENERIC_S3_JC3248W535/
 
 ### Step 3: Create sdkconfig.board
 
+**Location:** `boards/ESP32_GENERIC_S3_JC3248W535/sdkconfig.board`
+
+```bash
+# Navigate to your board directory
+cd ~/micropython_build/lvgl_micropython/lib/micropython/ports/esp32/boards/ESP32_GENERIC_S3_JC3248W535
+
+# Verify you're in the right place
+pwd
+# Should show: .../boards/ESP32_GENERIC_S3_JC3248W535
+
+# Create the file
+nano sdkconfig.board
+```
+
 Create `sdkconfig.board` with ESP32-S3 specific settings:
 
 ```ini
@@ -311,7 +325,18 @@ CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
 
 ### Step 4: Create mpconfigboard.cmake
 
-Create `mpconfigboard.cmake`:
+**Location:** `boards/ESP32_GENERIC_S3_JC3248W535/mpconfigboard.cmake`
+
+```bash
+# You should still be in the board directory
+pwd
+# Should show: .../boards/ESP32_GENERIC_S3_JC3248W535
+
+# Create the file
+nano mpconfigboard.cmake
+```
+
+Create `mpconfigboard.cmake` with this content:
 
 ```cmake
 set(IDF_TARGET esp32s3)
@@ -332,6 +357,10 @@ set(MICROPY_FROZEN_MANIFEST ${MICROPY_BOARD_DIR}/manifest.py)
 
 ```bash
 # You should still be in the board directory
+pwd
+# Should show: .../boards/ESP32_GENERIC_S3_JC3248W535
+
+# Create the file
 nano mpconfigboard.h
 ```
 
@@ -390,6 +419,10 @@ Create `mpconfigboard.h` with all pin definitions from Arduino code:
 
 ```bash
 # You should still be in the board directory
+pwd
+# Should show: .../boards/ESP32_GENERIC_S3_JC3248W535
+
+# Create the file
 nano lv_conf.h
 ```
 
@@ -573,6 +606,10 @@ Create `lv_conf.h` with board-specific LVGL settings from Arduino:
 
 ```bash
 # You should still be in the board directory
+pwd
+# Should show: .../boards/ESP32_GENERIC_S3_JC3248W535
+
+# Create the file
 nano manifest.py
 ```
 
@@ -591,6 +628,10 @@ freeze("$(BOARD_DIR)/modules")
 
 ```bash
 # You should still be in the board directory
+pwd
+# Should show: .../boards/ESP32_GENERIC_S3_JC3248W535
+
+# Create the file
 nano partitions.csv
 ```
 
