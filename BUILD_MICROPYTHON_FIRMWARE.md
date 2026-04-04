@@ -989,17 +989,27 @@ make -C lib/micropython/mpy-cross CFLAGS_EXTRA="-Wno-error"
 
 ### Step 4: Set Up ESP-IDF Environment
 
-**CRITICAL:** You must source the ESP-IDF environment before building:
+**CRITICAL:** You must source the ESP-IDF environment before building. This sets up the toolchain and creates the Python virtual environment.
 
 ```bash
 # Navigate to ESP-IDF directory
 cd ~/micropython_build/lvgl_micropython/esp-idf
 
-# Source the environment (sets up toolchain paths)
+# Source the environment (sets up toolchain paths and virtual environment)
 source export.sh
 
 # You should see output like:
 # "Done! You can now compile ESP-IDF projects."
+# "Python 3.11.x"
+# "Using Python interpreter in ~/.espressif/python_env/..."
+
+# IMPORTANT: Verify the virtual environment was activated
+echo $IDF_PYTHON_ENV_PATH
+# Should show: /home/lpinard/.espressif/python_env/idf5.0_py3.11_env
+
+# Verify Python is from the virtual environment
+which python
+# Should show: /home/lpinard/.espressif/python_env/idf5.0_py3.11_env/bin/python
 
 # Return to lvgl_micropython root
 cd ~/micropython_build/lvgl_micropython
@@ -1008,6 +1018,11 @@ cd ~/micropython_build/lvgl_micropython
 pwd
 # Should show: .../micropython_build/lvgl_micropython
 ```
+
+**If you get "virtual environment not found" error:**
+1. Make sure you ran `./install.sh esp32s3` successfully
+2. Check that `~/.espressif/python_env/` directory exists
+3. Re-run the install: `cd esp-idf && ./install.sh esp32s3`
 
 ### Step 5: Build for JC3248W535
 
