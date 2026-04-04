@@ -531,11 +531,13 @@ LVGL v9 in this MicroPython firmware does not poll registered input devices.
 
 ### ✅ Confirmed Working
 
-1. **Touch Hardware**
+1. **Touch Hardware** ⭐ VERIFIED WITH FACTORY FIRMWARE
    - AXS15231 touch controller functional
    - I2C communication perfect
    - Coordinates accurate and responsive
    - Test: `test_touch_poll.py` captured hundreds of events
+   - **Factory firmware test: Touch works perfectly** (confirmed 2026-04-03)
+   - Hardware is 100% good - no damage from testing
 
 2. **Display**
    - AXS15231B display controller working
